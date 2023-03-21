@@ -3,6 +3,7 @@ import * as wss from './wss.js'
 import * as webRTCHandler from './webRTCHandler.js';
 import * as constants from './constants.js';
 import * as ui from './ui.js';
+import * as recordingUtils from './recordingUtils.js';
 
 const socket = io('/');
 
@@ -12,8 +13,8 @@ webRTCHandler.getLocalPreview();
 
 const personalCodeCopyButton = document.getElementById('personal_code_copy_button');
 personalCodeCopyButton.addEventListener('click', () => {
-   const personalCode = store.getState().socketId;
-   navigator.clipboard && navigator.clipboard.writeText(personalCode);
+    const personalCode = store.getState().socketId;
+    navigator.clipboard && navigator.clipboard.writeText(personalCode);
 });
 
 
@@ -57,4 +58,48 @@ const switchForScreenSharingButton = document.getElementById('screen_sharing_but
 switchForScreenSharingButton.addEventListener('click', () => {
     const screenSharingActive = store.getState().screenSharingActive;
     webRTCHandler.switchBetweenCameraAndScreenSharing(screenSharingActive);
+});
+
+const newMessageInput = document.getElementById('new_message_input');
+newMessageInput.addEventListener('keydown', (event) => {
+    console.log('change occured');
+    const key = event.key;
+
+    if (key === 'Enter') {
+        webRTCHandler.sendMessageUsingDataChannel(event.target.value);
+        ui.appendMessage(event.target.value, true);
+        newMessageInput.value = '';
+    }
+});
+
+const sendMessageButton = document.getElementById('send_message_button');
+sendMessageButton.addEventListener('click', () => {
+    const message = newMessageInput.value;
+    webRTCHandler.sendMessageUsingDataChannel(message);
+    ui.appendMessage(message, true);
+    newMessageInput.value = '';
+});
+
+const startRecordingButton = document.getElementById('start_recording_button');
+startRecordingButton.addEventListener('click', () => {
+    recordingUtils.startRecording();
+    ui.showRecordingPanel();
+});
+
+const stopRecordingButton = document.getElementById('stop_recording_button');
+stopRecordingButton.addEventListener('click', () => {
+    recordingUtils.stopRecording();
+    ui.resetRecordingButtons();
+});
+
+const pauseRecordingButton = document.getElementById('pause_recording_button');
+pauseRecordingButton.addEventListener('click', () => {
+   recordingUtils.pauseRecording();
+   ui.switchRecordingButtons(true);
+});
+
+const resumeRecordingButton = document.getElementById('resume_recording_button');
+resumeRecordingButton.addEventListener('click', () => {
+    recordingUtils.resumeRecording();
+    ui.switchRecordingButtons();
 });

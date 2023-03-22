@@ -60,6 +60,19 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('user-hang-up', (data) => {
+        const { connectedUserSocketId } = data;
+
+        const connectedPeer = connectedPeers.find((peerSocketId) => {
+            return peerSocketId === connectedUserSocketId;
+        });
+
+        if (connectedPeer) {
+            io.to(connectedUserSocketId).emit('user-hanged-up');
+        }
+
+    })
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
         connectedPeers = connectedPeers.filter((peerSocketId) => {

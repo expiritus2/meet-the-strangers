@@ -1,5 +1,6 @@
 import * as constants from './constants.js';
 import * as elements from './elements.js';
+import { callType } from './constants.js';
 
 export const updatePersonalCode = (personalCode) => {
     const personalCodeParagraph = document.getElementById('personal_code_paragraph');
@@ -141,11 +142,11 @@ export const clearMessenger = () => {
 };
 
 export const showRecordingPanel = () => {
-  const recordingButtons = document.getElementById('video_recording_buttons');
-  showElement(recordingButtons);
+    const recordingButtons = document.getElementById('video_recording_buttons');
+    showElement(recordingButtons);
 
-  const startRecordingButton = document.getElementById('start_recording_button');
-  hideElement(startRecordingButton);
+    const startRecordingButton = document.getElementById('start_recording_button');
+    hideElement(startRecordingButton);
 };
 
 export const resetRecordingButtons = () => {
@@ -184,7 +185,7 @@ export const disableDashboard = () => {
 };
 
 export const hideElement = (element) => {
-    if (!element.classList.contains('diaplay_none')) {
+    if (!element.classList.contains('display_none')) {
         element.classList.add('display_none');
     }
 }
@@ -198,4 +199,31 @@ export const showElement = (element) => {
 export const updateRemoteVideo = (stream) => {
     const remoteVideo = document.getElementById('remote_video');
     remoteVideo.srcObject = stream;
+};
+
+export const updateUIAfterHangUp = (callType) => {
+    enableDashboard();
+
+    if (callType === constants.callType.VIDEO_PERSONAL_CODE || callType === constants.callType.VIDEO_STRANGER) {
+        const callButtons = document.getElementById('call_buttons');
+        hideElement(callButtons);
+    } else {
+        const chatCallButtons = document.getElementById('finish_chat_button_container');
+        hideElement(chatCallButtons);
+    }
+
+    const newMessageInput = document.getElementById('new_message');
+    hideElement(newMessageInput);
+    clearMessenger();
+
+    updateMicButton(false);
+    updateCameraButton(false);
+
+    const remoteVideo = document.getElementById('remote_video');
+    hideElement(remoteVideo);
+
+    const placeholder = document.getElementById('video_placeholder');
+    showElement(placeholder);
+
+    removeAllDialogs();
 };
